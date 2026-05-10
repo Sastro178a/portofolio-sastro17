@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sastro Negoro | Arsitek Ekosistem Digital</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        tech: ['Orbitron', 'sans-serif'],
+                        body: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#050505',
+                        darker: '#0a0a0a',
+                        card: 'rgba(20, 20, 20, 0.6)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CSS Variables for Dynamic Neon */
+        :root {
+            --hue: 200; /* Start with Blue */
+            --neon-intensity: 0.2; /* Base glow intensity */
+            --neon-color: hsl(var(--hue), 100%, 50%);
+            --neon-glow: drop-shadow(0 0 calc(var(--neon-intensity) * 15px) var(--neon-color));
+            /* Shadow dipertajam agar neon terlihat lebih seperti garis tegas */
+            --neon-box-shadow: 0 0 calc(var(--neon-intensity) * 15px) var(--neon-color), 
+                               inset 0 0 calc(var(--neon-intensity) * 8px) var(--neon-color);
+        }
+
+        body {
+            background-color: theme('colors.dark');
+            color: #f3f4f6; /* Warna teks dasar diperterang agar lebih kontras */
+            overflow-x: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600; /* Membuat seluruh teks bawaan lebih tebal */
+        }
+
+        h1, h2, h3, h4, .font-tech {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Neon Text Effect */
+        .text-neon {
+            color: #fff;
+            /* Sebaran cahaya diturunkan agar tidak silau/putih */
+            text-shadow: 0 0 calc(var(--neon-intensity) * 3px) var(--neon-color),
+                         0 0 calc(var(--neon-intensity) * 8px) var(--neon-color);
+            transition: text-shadow 0.1s ease-out;
+        }
+
+        /* Neon Border/Box Effect */
+        .border-neon {
+            border: 2px solid var(--neon-color); /* Garis border dipertebal */
+            /* Intensitas box-shadow juga dikurangi */
+            --neon-box-shadow: 0 0 calc(var(--neon-intensity) * 8px) var(--neon-color), 
+                               inset 0 0 calc(var(--neon-intensity) * 4px) var(--neon-color);
+            box-shadow: var(--neon-box-shadow);
+            transition: box-shadow 0.1s ease-out, border-color 0.1s ease-out;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Image Frame Styling */
+        .img-frame {
+            position: relative;
+            overflow: hidden;
+            background-color: #111;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .img-frame:hover {
+            border-color: var(--neon-color);
+            box-shadow: var(--neon-box-shadow);
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        .img-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .img-frame:hover img {
+            transform: scale(1.1);
+        }
+        
+        /* Broken image fallback text */
+        .img-frame img:before {
+            content: "Frame: " attr(alt);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            color: var(--neon-color);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            text-align: center;
+            padding: 1rem;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-color); border-radius: 4px; }
+
+        /* Floating elements background */
+        .bg-grid {
+            background-size: 50px 50px;
+            /* Intensitas garis dipertipis agar terlihat sangat elegan dan tidak "kotor" */
+            background-image: linear-gradient(to right, hsla(var(--hue), 100%, 50%, calc(var(--neon-intensity) * 0.1)) 1px, transparent 1px),
+                              linear-gradient(to bottom, hsla(var(--hue), 100%, 50%, calc(var(--neon-intensity) * 0.1)) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, transparent, black, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black, transparent);
+            transition: background-image 0.1s ease-out;
+        }
+
+        /* Cahaya Lembut di Belakang Teks (Beat Effect) */
+        .text-beat-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            /* Opacity diturunkan drastis dari 0.15 menjadi 0.05 agar sangat halus */
+            background: radial-gradient(circle, hsla(var(--hue), 100%, 50%, calc(var(--neon-intensity) * 0.05)) 0%, transparent 60%);
+            z-index: -1; /* Berada tepat di belakang teks */
+            transition: background 0.1s ease-out;
+            pointer-events: none;
+            filter: blur(40px); /* Dibuat sangat blur agar tidak mengganggu tulisan */
+        }
+
+        /* Kursor Zoom untuk Gambar yang bisa di-klik */
+        .img-zoomable {
+            cursor: zoom-in;
+            transition: opacity 0.3s ease;
+        }
+        .img-zoomable:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-white selection:text-black font-semibold text-lg">
+
+    <!-- IMAGE LIGHTBOX POPUP -->
+    <div id="imageLightbox" class="fixed inset-0 z-[150] bg-[#020202]/95 backdrop-blur-md flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <button id="closeLightbox" class="absolute top-6 right-8 text-gray-400 hover:text-neon text-5xl transition-colors">&times;</button>
+        <!-- Kontainer Gambar -->
+        <img id="lightboxImg" src="" alt="Popup Image" class="max-w-[90vw] max-h-[85vh] object-contain rounded-xl border border-gray-700 shadow-[0_0_30px_var(--neon-color)] transform scale-95 transition-transform duration-300">
+    </div>
+
+    <!-- WELCOME POPUP -->
+    <div id="welcomePopup" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#020202]/90 backdrop-blur-xl transition-opacity duration-500">
+        <div id="popupCard" class="glass-card p-8 md:p-12 rounded-3xl border-neon max-w-lg mx-4 text-center transform scale-95 opacity-0 transition-all duration-500">
+            <div class="relative inline-block mb-6">
+                <div class="absolute inset-0 bg-[var(--neon-color)] blur-xl opacity-30 rounded-full"></div>
+                <i class="ph ph-headphones text-6xl text-neon relative z-10"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-tech font-bold text-white mb-4">Selamat Datang di<br><span class="text-neon">Dimensi Digital</span></h2>
+            <p class="text-gray-300 mb-8 leading-relaxed text-sm md:text-base font-medium">
+                Halo! Saya Moh Agus Sastro Negoro. Portofolio ini dirancang dengan pengalaman audio-visual yang reaktif. <br><br>
+                Pastikan <b>volume perangkat Anda menyala</b> untuk merasakan pengalaman maksimal!
+            </p>
+            <button id="startBtn" class="px-8 py-3 bg-[var(--neon-color)] text-black font-tech font-bold rounded-full hover:scale-105 transition-transform shadow-[0_0_20px_var(--neon-color)] text-lg w-full sm:w-auto">
+                LANJUT JELAJAHI
+            </button>
+        </div>
+    </div>
+
+    <!-- HEADER / NAVIGATION MENU -->
+    <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300">
+        <div class="glass-card border-b border-gray-800/50 bg-dark/80 backdrop-blur-md relative z-10">
+            <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+                <div class="font-tech font-bold text-xl text-white">SASTRO<span class="text-neon">.</span></div>
+                
+                <!-- Desktop Menu (Tersembunyi di Mobile) -->
+                <nav class="hidden md:flex gap-6 font-tech text-sm tracking-widest text-gray-400">
+                    <a href="#hero" class="hover:text-white hover:text-neon transition-all">HOME</a>
+                    <a href="#about" class="hover:text-white hover:text-neon transition-all">ABOUT</a>
+                    <a href="#roles" class="hover:text-white hover:text-neon transition-all">ROLES</a>
+                    <a href="#masterpiece" class="hover:text-white hover:text-neon transition-all">MASTERPIECE</a>
+                    <a href="#skills" class="hover:text-white hover:text-neon transition-all">SKILLS</a>
+                </nav>
+
+                <!-- Tombol Mobile Burger (Hanya Muncul di Mobile) -->
+                <button id="mobileMenuBtn" class="md:hidden text-2xl text-gray-300 hover:text-white hover:text-neon transition-all focus:outline-none">
+                    <i id="burgerIcon" class="ph ph-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown (Kaca Transparan) -->
+        <nav id="mobileMenu" class="absolute top-16 left-0 w-full bg-dark/95 backdrop-blur-xl border-b border-gray-800/50 flex flex-col items-center py-8 gap-6 font-tech tracking-widest text-gray-400 transform -translate-y-full opacity-0 transition-all duration-300 -z-10 shadow-2xl">
+            <a href="#hero" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">HOME</a>
+            <a href="#about" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">ABOUT</a>
+            <a href="#roles" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">ROLES</a>
+            <a href="#masterpiece" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">MASTERPIECE</a>
+            <a href="#skills" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">SKILLS</a>
+        </nav>
+    </header>
+
+    <!-- Latar Belakang Bar Beat (Equalizer Raksasa di Background) -->
+    <!-- Z-index disesuaikan (z-[0]) agar tampil di atas background gelap tapi di bawah konten -->
+    <div id="bg-visualizer" class="fixed bottom-0 left-0 w-full h-[40vh] flex items-end justify-center gap-1 z-[0] opacity-40 pointer-events-none px-2 sm:px-6">
+        <!-- Bar akan di-generate otomatis oleh JavaScript -->
+    </div>
+
+    <!-- Global Image Background (hero.png) - Dibuat jauh lebih redup agar tidak kotor -->
+    <div class="fixed inset-0 z-[-3] bg-[url('hero.png')] bg-cover bg-center bg-no-repeat opacity-[0.03] filter blur-[4px]"></div>
+
+    <!-- Background Grid -->
+    <div class="fixed inset-0 z-[-2] bg-grid opacity-30"></div>
+    <div class="fixed top-0 left-0 w-full h-full z-[-4] bg-gradient-to-b from-[#020202] via-[#050505] to-[#020202]"></div>
+
+    <!-- Main Content -->
+    <!-- Padding atas ditambah (pt-32) agar bagian Hero tidak tertutup oleh Navbar Menu -->
+    <main class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-32 pb-32 relative z-10">
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="min-h-[80vh] flex flex-col lg:flex-row justify-center items-center gap-12 gs-reveal">
+            
+            <!-- Hero Text (Kiri) -->
+            <div class="lg:w-1/2 flex flex-col items-start w-full relative z-10">
+                <!-- Elemen Beat Text Background diletakkan di sini -->
+                <div class="text-beat-bg"></div>
+
+                <p class="text-neon font-tech text-2xl md:text-3xl font-bold tracking-widest uppercase mb-4">Hello, World. I am</p>
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black font-tech uppercase leading-tight mb-2 text-white drop-shadow-2xl">
+                    Moh Agus <br> 
+                    <span class="text-neon">Sastro Negoro</span>
+                </h1>
+                <h2 class="text-2xl md:text-4xl font-tech font-bold text-gray-100 mt-4 mb-6 drop-shadow-lg">
+                    Tech Developer, Leader of Design, & Visionary Documentator.
+                </h2>
+                <p class="text-gray-200 font-bold text-xl md:text-2xl max-w-3xl leading-relaxed">
+                    Arsitek ekosistem digital sekolah, pemimpin visi kreatif, dan pengabadi momen yang berdedikasi untuk inovasi dan kemajuan Grisawangi.
+                </p>
+                
+                <div class="mt-12 p-6 glass-card border-neon rounded-xl inline-block w-full max-w-2xl transform transition hover:-translate-y-2 relative overflow-hidden">
+                    <h3 class="text-neon font-tech text-xl mb-2 flex items-center gap-2">
+                        <i class="ph ph-terminal-window text-2xl"></i> Work Philosophy
+                    </h3>
+                    <p class="text-gray-300 italic">
+                        "Code with logic. Design with passion. Document with soul. Saya percaya bahwa setiap detail kecil menentukan kualitas dari sebuah mahakarya."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Hero Image (Kanan) -->
+            <div class="lg:w-1/2 w-full flex justify-center lg:justify-end mt-10 lg:mt-0 relative">
+                <!-- Elemen aksen cahaya di belakang foto -->
+                <div class="absolute inset-0 bg-[var(--neon-color)] blur-[80px] opacity-20 rounded-full transition-colors duration-100"></div>
+                
+                <!-- Frame untuk hero.png -->
+                <div class="img-frame aspect-square md:aspect-[4/3] w-full max-w-[500px] border-neon rounded-2xl relative z-10">
+                    <img src="hero.png" alt="hero.png">
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about" class="py-24 gs-reveal">
+            <div class="flex flex-col lg:flex-row gap-12 items-center relative">
+                <div class="w-full lg:w-1/3">
+                    <!-- FRAME FOTO: sastro -->
+                    <div class="img-frame aspect-[3/4] w-full max-w-sm mx-auto shadow-2xl relative z-10">
+                        <img src="sastro.jpg" alt="sastro.jpg" loading="lazy" class="img-zoomable">
+                    </div>
+                </div>
+                <div class="w-full lg:w-2/3 glass-card p-8 md:p-10 rounded-2xl border-neon relative">
+                    <!-- Beat Text Background untuk bagian About -->
+                    <div class="text-beat-bg" style="width: 150%; height: 150%;"></div>
+                    
+                    <h2 class="text-4xl font-tech font-bold text-white mb-6 flex items-center gap-3 relative z-10">
+                        <i class="ph ph-user-circle text-neon"></i> Integrasi Teknologi, Kreativitas, & Pengabdian
+                    </h2>
+                    <div class="space-y-4 text-gray-200 text-lg leading-relaxed relative z-10 font-medium">
+                        <p>
+                            Berasal dari Banyuwangi, perjalanan saya sebagai siswa TJKT di SMK PGRI 1 Giri bukan sekadar tentang mempelajari teknologi, tetapi tentang bagaimana teknologi dapat memberikan solusi nyata. Saat ini, saya memfokuskan energi saya pada eksplorasi Development dan AI Agent melalui ekosistem <span class="text-neon font-bold">e-Aspirasi Grisawangi</span>.
+                        </p>
+                        <p>
+                            Sisi logis saya sebagai pengembang selalu diseimbangkan oleh insting estetika saya sebagai <span class="text-neon font-semibold">Leader of Desain</span> Grisawangi. Saya memimpin arah visual sekolah untuk memastikan setiap karya grafis memiliki standar profesional.
+                        </p>
+                        <p>
+                            Lebih dari sekadar teknisi dan kreator, jiwa sosial saya tersalurkan penuh sebagai <span class="text-neon font-semibold">Partner BK</span>. Saya aktif mendampingi rekan sebaya hingga menjadi motor penggerak program-program besar seperti Jumat BK. Bagi saya, setiap baris kode, setiap piksel desain, dan setiap percakapan adalah bentuk dedikasi saya untuk almamater.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EDUCATION TIMELINE SECTION (Pindah ke Tengah) -->
+        <section id="education" class="py-24 gs-reveal relative">
+            <div class="text-beat-bg" style="width: 80%; top: 50%;"></div>
+            <h2 class="text-5xl font-tech font-bold text-center mb-16 text-white text-neon">Riwayat Pendidikan</h2>
+            
+            <div class="max-w-4xl mx-auto relative z-10 px-4">
+                <!-- Garis vertikal: Di kiri untuk mobile, Di tengah untuk Desktop -->
+                <div class="absolute left-[30px] md:left-1/2 transform md:-translate-x-1/2 top-0 bottom-0 w-1 bg-gray-800 rounded-full"></div>
+                
+                <div class="space-y-12">
+                    <!-- SMK -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between w-full gs-item">
+                        <div class="md:w-5/12 w-full pl-16 md:pl-0 order-2 md:order-1 text-left md:text-right">
+                            <div class="glass-card p-6 rounded-2xl border-neon relative hover:scale-105 transition-transform">
+                                <h4 class="text-2xl font-tech font-bold text-white">SMK PGRI 1 Giri Banyuwangi</h4>
+                                <p class="text-neon font-bold text-sm mb-2">2024 - Sekarang</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-[18px] md:left-1/2 transform md:-translate-x-1/2 mt-6 md:mt-0 w-7 h-7 rounded-full bg-[var(--neon-color)] border-4 border-[#020202] shadow-[0_0_15px_var(--neon-color)] z-20 order-1 md:order-2"></div>
+                        <div class="md:w-5/12 w-full order-3 hidden md:block"></div>
+                    </div>
+
+                    <!-- MTs -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between w-full gs-item">
+                        <div class="md:w-5/12 w-full order-1 hidden md:block"></div>
+                        <div class="absolute left-[18px] md:left-1/2 transform md:-translate-x-1/2 mt-6 md:mt-0 w-7 h-7 rounded-full bg-gray-600 border-4 border-[#020202] z-20 order-2 md:order-2 transition-colors hover:bg-[var(--neon-color)]"></div>
+                        <div class="md:w-5/12 w-full pl-16 md:pl-0 order-3 text-left">
+                            <div class="glass-card p-6 rounded-2xl border border-gray-700 relative hover:border-[var(--neon-color)] transition-colors">
+                                <h4 class="text-2xl font-tech font-bold text-gray-300">MTs Syamsul Huda</h4>
+                                <p class="text-gray-500 font-bold text-sm mb-2">2020 - 2024</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MI -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between w-full gs-item">
+                        <div class="md:w-5/12 w-full pl-16 md:pl-0 order-2 md:order-1 text-left md:text-right">
+                            <div class="glass-card p-6 rounded-2xl border border-gray-700 relative hover:border-[var(--neon-color)] transition-colors">
+                                <h4 class="text-2xl font-tech font-bold text-gray-300">MI Bustanul Mubtadiin</h4>
+                                <p class="text-gray-500 font-bold text-sm mb-2">2014 - 2020</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-[18px] md:left-1/2 transform md:-translate-x-1/2 mt-6 md:mt-0 w-7 h-7 rounded-full bg-gray-600 border-4 border-[#020202] z-20 order-1 md:order-2 transition-colors hover:bg-[var(--neon-color)]"></div>
+                        <div class="md:w-5/12 w-full order-3 hidden md:block"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 PILLARS / ROLES SECTION -->
+        <section id="roles" class="py-24 gs-reveal relative">
+            <div class="text-beat-bg" style="width: 80%; top: 20%;"></div>
+            <h2 class="text-5xl font-tech font-bold text-center mb-16 text-white text-neon">Core Roles & Dedication</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
+                <!-- Role 1: Developer -->
+                <div class="glass-card p-8 rounded-2xl border-t border-gray-700 hover:border-neon transition duration-300 gs-item">
+                    <i class="ph ph-code text-5xl text-neon mb-4 block"></i>
+                    <h3 class="text-2xl font-tech font-bold text-white mb-3">Lead Developer</h3>
+                    <p class="text-gray-400 mb-6">Membangun ekosistem digital e-Aspirasi dari nol untuk menghubungkan siswa, guru, dan orang tua secara efisien. Sebuah dedikasi untuk transparansi birokrasi di Grisawangi.</p>
+                </div>
+
+                <!-- Role 2: Design -->
+                <div class="glass-card p-8 rounded-2xl border-t border-gray-700 hover:border-neon transition duration-300 gs-item">
+                    <i class="ph ph-paint-brush-broad text-5xl text-neon mb-4 block"></i>
+                    <h3 class="text-2xl font-tech font-bold text-white mb-3">Leader of Desain</h3>
+                    <p class="text-gray-400 mb-6">Menahkodai arah visual sekolah, memastikan karya estetik, komunikatif, dan berstandar profesional.</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- FRAMES FOTO DESIGN -->
+                        <div class="img-frame aspect-square"><img src="presentasidesain.jpeg" alt="presentasidesain.jpeg" class="img-zoomable"></div>
+                        <div class="img-frame aspect-square"><img src="pembelajaraankameradesain.jpeg" alt="pembelajaraankameradesain.jpeg" class="img-zoomable"></div>
+                        <div class="img-frame aspect-square"><img src="logodesainkamera.jpg" alt="logodesainkamera.jpg" class="img-zoomable"></div>
+                    </div>
+                </div>
+
+                <!-- Role 3: Partner BK -->
+                <div class="glass-card p-8 rounded-2xl border-t border-gray-700 hover:border-neon transition duration-300 gs-item">
+                    <i class="ph ph-users-three text-5xl text-neon mb-4 block"></i>
+                    <h3 class="text-2xl font-tech font-bold text-white mb-3">Partner BK</h3>
+                    <p class="text-gray-400 mb-6">Menjadi jembatan empati, membantu pembelajaran di kelas, dan motor penggerak program Jumat BK.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- FRAMES FOTO BK -->
+                        <div class="img-frame aspect-video"><img src="jumatbk.jpeg" alt="jumatbk.jpeg" class="img-zoomable"></div>
+                        <div class="img-frame aspect-video"><img src="sertifikatbk.jpg" alt="sertifikatbk.jpg" class="img-zoomable"></div>
+                    </div>
+                </div>
+
+                <!-- Role 4: Dokumentator -->
+                <div class="glass-card p-8 rounded-2xl border-t border-gray-700 hover:border-neon transition duration-300 gs-item">
+                    <i class="ph ph-camera text-5xl text-neon mb-4 block"></i>
+                    <h3 class="text-2xl font-tech font-bold text-white mb-3">Dokumentator OSIS</h3>
+                    <p class="text-gray-400 mb-6">Merangkai setiap kejadian penting sekolah menjadi cerita sinematik melalui lensa kamera.</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- FRAMES FOTO DOKUMENTATOR -->
+                        <div class="img-frame aspect-square"><img src="dokumerntasiharkartini.jpg" alt="dokumerntasiharkartini.jpg" class="img-zoomable"></div>
+                        <div class="img-frame aspect-[3/4]"><img src="dokumsosialisasi.jpeg" alt="dokumsosialisasi.jpeg" class="img-zoomable"></div>
+                        <div class="img-frame aspect-square"><img src="pegangkamera.png" alt="pegangkamera.png" class="img-zoomable"></div>
+                    </div>
+                </div>
+
+                <!-- Role 3: Partner BK -->
+                <div class="glass-card p-8 rounded-2xl border-t border-gray-700 hover:border-neon transition duration-300 gs-item">
+                    <i class="ph ph-users-three text-5xl text-neon mb-4 block"></i>
+                    <h3 class="text-2xl font-tech font-bold text-white mb-3">Partner BK</h3>
+                    <p class="text-gray-400 mb-6">Menjadi jembatan empati, membantu pembelajaran di kelas, dan motor penggerak program Jumat BK.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- FRAMES FOTO BK -->
+                        <div class="img-frame aspect-video"><img src="jumatbk.jpeg" alt="jumatbk.jpeg"></div>
+                        <div class="img-frame aspect-video"><img src="sertifikatbk.jpg" alt="sertifikatbk.jpg"></div>
+                    </div>
+                </div>
+
+                <!-- Role 4: Dokumentator -->
+                <div class="glass-card p-8 rounded-2xl border-t border-gray-700 hover:border-neon transition duration-300 gs-item">
+                    <i class="ph ph-camera text-5xl text-neon mb-4 block"></i>
+                    <h3 class="text-2xl font-tech font-bold text-white mb-3">Dokumentator OSIS</h3>
+                    <p class="text-gray-400 mb-6">Merangkai setiap kejadian penting sekolah menjadi cerita sinematik melalui lensa kamera.</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- FRAMES FOTO DOKUMENTATOR -->
+                        <div class="img-frame aspect-square"><img src="dokumerntasiharkartini.jpg" alt="dokumerntasiharkartini.jpg"></div>
+                        <div class="img-frame aspect-[3/4]"><img src="dokumsosialisasi.jpeg" alt="dokumsosialisasi.jpeg"></div>
+                        <div class="img-frame aspect-square"><img src="pegangkamera.png" alt="pegangkamera.png"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MASTERPIECE SECTION -->
+        <section id="masterpiece" class="py-24 gs-reveal relative">
+            <div class="text-center mb-16 relative z-10">
+                <div class="text-beat-bg"></div>
+                <p class="text-neon font-tech text-xl tracking-widest uppercase mb-2 font-bold">The Masterpiece</p>
+                <h2 class="text-5xl md:text-6xl font-tech font-bold text-white">e-Aspirasi Grisawangi</h2>
+                <p class="mt-4 text-gray-300 font-medium max-w-2xl mx-auto">Ekosistem informasi sekolah berbasis web yang terus berevolusi dengan teknologi modern.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+                <div class="lg:col-span-8 glass-card rounded-2xl p-6 border-neon group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-[var(--neon-color)] opacity-5 transition-colors duration-500"></div>
+                    <h3 class="text-2xl font-tech text-white mb-4 relative z-10 flex items-center gap-2"><i class="ph ph-browser"></i> Core System & Student Service</h3>
+                    <!-- FRAME FOTO: Index -->
+                    <div class="img-frame aspect-[3/4] w-full relative z-10">
+                        <img src="indexeasispirasi.jpeg" alt="indexeasispirasi.jpeg" class="img-zoomable">
+                    </div>
+                    <p class="mt-6 text-gray-300 relative z-10">Layanan siswa terpadu untuk menyuarakan aspirasi dengan aman. Termasuk integrasi Sistem Kedisiplinan Objektif (kalkulasi poin otomatis) dan Multi-Portal Access untuk guru.</p>
+                </div>
+
+                <div class="lg:col-span-4 flex flex-col gap-8">
+                    <!-- Absensi -->
+                    <div class="glass-card rounded-2xl p-6 hover:border-neon transition-all h-full">
+                        <h3 class="text-xl font-tech text-white mb-3 flex items-center gap-2"><i class="ph ph-qr-code"></i> Digital Attendance</h3>
+                        <!-- FRAME FOTO: Absensi -->
+                        <div class="img-frame aspect-[3/4] w-full mb-4">
+                            <img src="portalscanqrabsen.jpeg" alt="portalscanqrabsen.jpeg" class="img-zoomable">
+                        </div>
+                        <p class="text-sm text-gray-400">Pencatatan absensi digital harian yang cepat, akurat, berbasis scan QR terintegrasi.</p>
+                    </div>
+
+                    <!-- Portal Ortu -->
+                    <div class="glass-card rounded-2xl p-6 hover:border-neon transition-all h-full">
+                        <h3 class="text-xl font-tech text-white mb-3 flex items-center gap-2"><i class="ph ph-shield-check"></i> Parental Portal</h3>
+                        <!-- FRAME FOTO: Portal Ortu -->
+                        <div class="img-frame aspect-[3/4] w-full mb-4">
+                            <img src="portalortu.jpeg" alt="portalortu.jpeg" class="img-zoomable">
+                        </div>
+                        <p class="text-sm text-gray-400">Jembatan digital untuk memantau data kehadiran dan kedisiplinan anak secara real-time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SKILLS & FUTURE EXPLORATIONS -->
+        <section id="skills" class="py-24 gs-reveal">
+            <h2 class="text-5xl font-tech font-bold text-center mb-16 text-white text-neon">Keahlian & Penjelajahan</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <!-- Tech Stack & Education -->
+                <div>
+                    <!-- Bagian Latar Belakang (Riwayat Pendidikan) telah dipindah -->
+                    <h2 class="text-3xl font-tech font-bold text-white mb-8 border-b border-gray-800 pb-4">Kemampuan Unggulan</h2>
+                    <!-- Diagram Keahlian (Skill Bars) -->
+                    <div class="mb-10 p-6 glass-card border-neon rounded-2xl relative overflow-hidden">
+                        <h3 class="text-neon font-tech text-xl mb-6 flex items-center gap-2">
+                            <i class="ph ph-chart-bar text-2xl"></i> Tingkat Penguasaan
+                        </h3>
+                        
+                        <div class="space-y-5">
+                            <!-- Skill 1 -->
+                            <div>
+                                <div class="flex justify-between mb-1 font-tech text-sm font-bold text-gray-200">
+                                    <span>Pemrograman (Programming)</span>
+                                    <span>70%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 rounded-full h-2">
+                                    <div class="bg-[var(--neon-color)] h-2 rounded-full shadow-[0_0_10px_var(--neon-color)]" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <!-- Skill 2 -->
+                            <div>
+                                <div class="flex justify-between mb-1 font-tech text-sm font-bold text-gray-200">
+                                    <span>Berbicara di Depan Umum (Public Speaking)</span>
+                                    <span>80%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 rounded-full h-2">
+                                    <div class="bg-[var(--neon-color)] h-2 rounded-full shadow-[0_0_10px_var(--neon-color)]" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <!-- Skill 3 -->
+                            <div>
+                                <div class="flex justify-between mb-1 font-tech text-sm font-bold text-gray-200">
+                                    <span>Rekayasa AI (AI Engineer)</span>
+                                    <span>95%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 rounded-full h-2">
+                                    <div class="bg-[var(--neon-color)] h-2 rounded-full shadow-[0_0_10px_var(--neon-color)]" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <!-- Skill 4 -->
+                            <div>
+                                <div class="flex justify-between mb-1 font-tech text-sm font-bold text-gray-200">
+                                    <span>Desain Gambar (Image Design)</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 rounded-full h-2">
+                                    <div class="bg-[var(--neon-color)] h-2 rounded-full shadow-[0_0_10px_var(--neon-color)]" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <!-- Skill 5 -->
+                            <div>
+                                <div class="flex justify-between mb-1 font-tech text-sm font-bold text-gray-200">
+                                    <span>Fotografi (Photography)</span>
+                                    <span>80%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 rounded-full h-2">
+                                    <div class="bg-[var(--neon-color)] h-2 rounded-full shadow-[0_0_10px_var(--neon-color)]" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="text-neon font-tech text-xl mb-4">Teknologi & Pengembangan</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-2 glass-card rounded-full text-sm font-semibold border border-gray-700">HTML5 / CSS3</span>
+                            <span class="px-4 py-2 glass-card border-neon rounded-full text-sm font-semibold shadow-[0_0_10px_var(--neon-color)]">Pakar Tailwind CSS</span>
+                            <span class="px-4 py-2 glass-card rounded-full text-sm font-semibold border border-gray-700">JavaScript</span>
+                            <span class="px-4 py-2 glass-card rounded-full text-sm font-semibold border border-gray-700">Supabase</span>
+                            <span class="px-4 py-2 glass-card rounded-full text-sm font-semibold border border-gray-700">Google Apps Script</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="text-neon font-tech text-xl mb-4">Kreatif & Sosial</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-2 glass-card rounded-full text-sm border border-gray-700">Arahan Seni (Art Direction)</span>
+                            <span class="px-4 py-2 glass-card rounded-full text-sm border border-gray-700">Fotografi</span>
+                            <span class="px-4 py-2 glass-card rounded-full text-sm border border-gray-700">Edit Video Profesional</span>
+                            <span class="px-4 py-2 glass-card rounded-full text-sm border border-gray-700">Berbicara di Depan Umum</span>
+                            <span class="px-4 py-2 glass-card rounded-full text-sm border border-gray-700">Konseling Teman Sebaya</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Future Exploration -->
+                <div>
+                    <h2 class="text-3xl font-tech font-bold text-white mb-8 border-b border-gray-800 pb-4">Eksplorasi Saat Ini</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-[var(--neon-color)] relative overflow-hidden">
+                            <i class="ph ph-robot text-6xl absolute -right-4 -bottom-4 opacity-10 text-white"></i>
+                            <h3 class="text-2xl font-tech text-white mb-2">Integrasi Agen AI</h3>
+                            <p class="text-gray-400">Mendalami implementasi kecerdasan buatan dalam sistem web untuk menciptakan interaksi cerdas yang mempermudah navigasi pengguna di sistem informasi sekolah.</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-[var(--neon-color)] relative overflow-hidden">
+                            <i class="ph ph-database text-6xl absolute -right-4 -bottom-4 opacity-10 text-white"></i>
+                            <h3 class="text-2xl font-tech text-white mb-2">Migrasi Basis Data Modern</h3>
+                            <p class="text-gray-400">Aktif mempelajari dan mengimplementasikan Supabase sebagai fondasi backend untuk memastikan arsitektur data lebih cepat, aman, dan siap menghadapi skala besar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-gray-800 bg-dark relative z-10 gs-reveal">
+        <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="text-center md:text-left flex flex-col gap-2">
+                <h3 class="text-3xl font-tech font-bold text-white mb-1">Moh Agus <span class="text-neon">Sastro Negoro</span></h3>
+                <p class="text-gray-400 italic">"Terus Belajar, Terus Membangun, Terus Mengabadi."</p>
+                
+                <!-- Alamat Ditambahkan -->
+                <div class="flex items-center justify-center md:justify-start gap-2 text-gray-500 mt-2 text-sm font-tech">
+                    <i class="ph ph-map-pin text-neon"></i>
+                    <p>Jl. Yos Sudarso, Klatakan, Kalipuro, Banyuwangi, Indonesia</p>
+                </div>
+            </div>
+            
+            <div class="text-center md:text-right">
+                <p class="text-sm text-gray-500">Crafted with Precision by Sastro Negoro</p>
+                <p class="text-sm text-neon font-tech mt-1">SMK PGRI 1 Giri (Grisawangi)</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FLOATING CONTACT MODAL TRIGGER -->
+    <div class="fixed bottom-6 left-6 z-50 flex flex-col-reverse gap-4 group">
+        <button id="contactBtn" class="w-14 h-14 rounded-full glass-card border-neon flex items-center justify-center text-white text-2xl shadow-2xl hover:scale-110 transition-transform">
+            <i class="ph ph-chats-circle text-neon"></i>
+        </button>
+        
+        <!-- Social Links (Hidden by default, shown on hover/click) -->
+        <div class="flex flex-col gap-3 opacity-0 translate-y-10 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto pb-2">
+            <a href="https://wa.me/6283863400384" target="_blank" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-green-400 hover:bg-green-400 hover:text-black transition-colors" title="WhatsApp">
+                <i class="ph ph-whatsapp-logo text-xl"></i>
+            </a>
+            <a href="https://t.me/Sastro178" target="_blank" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-blue-400 hover:bg-blue-400 hover:text-black transition-colors" title="Telegram">
+                <i class="ph ph-telegram-logo text-xl"></i>
+            </a>
+            <a href="https://instagram.com/str_z17" target="_blank" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-pink-400 hover:bg-pink-400 hover:text-black transition-colors" title="Instagram">
+                <i class="ph ph-instagram-logo text-xl"></i>
+            </a>
+            <a href="mailto:sasronegoro1707@gmail.com" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors" title="Email">
+                <i class="ph ph-envelope-simple text-xl"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- FLOATING MUSIC PLAYER -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="musicBtn" class="w-16 h-16 rounded-full bg-darker border-2 border-gray-700 flex items-center justify-center text-white shadow-[0_0_20px_rgba(0,0,0,0.8)] transition-all duration-300 overflow-hidden relative group">
+            <!-- Visualizer Bars (Animated via JS) -->
+            <div id="visualizer" class="absolute inset-0 flex items-end justify-center gap-[2px] opacity-0 transition-opacity duration-300 pb-2 px-2">
+                <div class="bar w-1 bg-[var(--neon-color)] rounded-t-sm" style="height: 10%"></div>
+                <div class="bar w-1 bg-[var(--neon-color)] rounded-t-sm" style="height: 30%"></div>
+                <div class="bar w-1 bg-[var(--neon-color)] rounded-t-sm" style="height: 50%"></div>
+                <div class="bar w-1 bg-[var(--neon-color)] rounded-t-sm" style="height: 20%"></div>
+                <div class="bar w-1 bg-[var(--neon-color)] rounded-t-sm" style="height: 40%"></div>
+            </div>
+            
+            <i id="playIcon" class="ph-fill ph-play text-2xl relative z-10 text-gray-400 group-hover:text-white transition-colors"></i>
+        </button>
+        
+        <!-- Elemen Audio (Kasingidang) -->
+        <!-- Ngginakaken link langsung lan crossorigin supados Web Audio API saged maca data saking njawi -->
+        <audio id="bgMusic" src="https://audio.jukehost.co.uk/019e1057-97a4-709b-8cd5-2226b3f91a9a" loop crossorigin="anonymous"></audio>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // 1. GSAP Scroll Animations (Blur & Reveal)
+        gsap.registerPlugin(ScrollTrigger);
+
+        const revealElements = document.querySelectorAll('.gs-reveal');
+        revealElements.forEach((el) => {
+            gsap.fromTo(el, 
+                { y: 50, opacity: 0, filter: "blur(10px)" },
+                { 
+                    y: 0, opacity: 1, filter: "blur(0px)", 
+                    duration: 1.2, 
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%", // Triggers when top of element hits 85% of viewport
+                        toggleActions: "play none none reverse" // Animates in and out slightly
+                    }
+                }
+            );
+        });
+
+        // Staggered items inside containers
+        const items = gsap.utils.toArray('.gs-item');
+        gsap.fromTo(items,
+            { y: 30, opacity: 0 },
+            {
+                y: 0, opacity: 1, duration: 0.8, stagger: 0.2, ease: "back.out(1.7)",
+                scrollTrigger: { trigger: '#roles', start: "top 75%" }
+            }
+        );
+
+        // 2. Audio Reactive Neon System
+        const audio = document.getElementById('bgMusic');
+        const playBtn = document.getElementById('musicBtn');
+        const playIcon = document.getElementById('playIcon');
+        const visualizer = document.getElementById('visualizer');
+        const bars = document.querySelectorAll('.bar');
+        
+        // --- SETUP: Latar Belakang Bar Beat (Equalizer) ---
+        const bgVisualizer = document.getElementById('bg-visualizer');
+        const numBgBars = 50; // Jumlah barisan equalizer di background
+        for(let i = 0; i < numBgBars; i++) {
+            let bar = document.createElement('div');
+            bar.className = 'bg-bar w-full bg-[var(--neon-color)] rounded-t-md transition-all duration-75';
+            bar.style.height = '2%';
+            bgVisualizer.appendChild(bar);
+        }
+        const bgBars = document.querySelectorAll('.bg-bar');
+
+        let isPlaying = false;
+        let audioContext, analyser, source, dataArray, bufferLength;
+        let animationId;
+        
+        // Color shifting parameters
+        let currentHue = 200; // Start Blue
+        
+        // Auto color shift even when music is off
+        setInterval(() => {
+            if(!isPlaying) {
+                currentHue = (currentHue + 1) % 360;
+                document.documentElement.style.setProperty('--hue', currentHue);
+                document.documentElement.style.setProperty('--neon-intensity', 0.15); // Static soft glow
+            }
+        }, 50);
+
+        function initAudio() {
+            if(audioContext) return; // Prevent multiple initializations
+            
+            // Setup Web Audio API
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            source = audioContext.createMediaElementSource(audio);
+            
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            analyser.fftSize = 256;
+            bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+        }
+
+        function animateNeon() {
+            if(!isPlaying) return;
+            
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Calculate average volume/beat
+            let sum = 0;
+            for(let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+            }
+            let average = sum / dataArray.length;
+            
+            // Map audio data to CSS variables
+            // Intensity peaks with bass - Pengali (multiplier) diturunkan dari 3.5 menjadi 1.2 agar ledakan cahayanya lebih terkontrol
+            let intensity = 0.1 + Math.pow(average / 255, 2) * 1.2; 
+            document.documentElement.style.setProperty('--neon-intensity', intensity);
+            
+            // Shift color based on beat intensity (warna berganti agresif saat beat tinggi)
+            currentHue = 180 + (average * 2.5);
+            if(currentHue > 360) currentHue = currentHue - 360;
+            document.documentElement.style.setProperty('--hue', currentHue);
+
+            // Animate mini visualizer bars in the button
+            bars.forEach((bar, index) => {
+                let barHeight = (dataArray[index * 4] / 255) * 100;
+                bar.style.height = `${Math.max(10, barHeight)}%`;
+            });
+
+            // --- ANIMASI: Background Visualizer Bars ---
+            bgBars.forEach((bar, index) => {
+                // Distribusikan data frekuensi ke 50 bar di background
+                let dataIndex = Math.floor(index * (bufferLength / numBgBars));
+                let barHeight = (dataArray[dataIndex] / 255) * 100;
+                bar.style.height = `${Math.max(2, barHeight)}%`;
+                
+                // Membuat bar di bagian tepi layar sedikit lebih transparan dibanding di tengah
+                let distanceFromCenter = Math.abs((numBgBars/2) - index) / (numBgBars/2);
+                bar.style.opacity = 1 - (distanceFromCenter * 0.6); 
+            });
+
+            animationId = requestAnimationFrame(animateNeon);
+        }
+
+        playBtn.addEventListener('click', () => {
+            if(!audioContext) initAudio();
+            
+            if(audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            if(isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                cancelAnimationFrame(animationId);
+                playIcon.classList.replace('ph-pause', 'ph-play');
+                playBtn.classList.remove('border-neon');
+                visualizer.style.opacity = '0';
+                playIcon.style.opacity = '1';
+                
+                // Reset neon to calm state
+                document.documentElement.style.setProperty('--neon-intensity', 0.15);
+            } else {
+                audio.play();
+                isPlaying = true;
+                animateNeon();
+                playIcon.classList.replace('ph-play', 'ph-pause');
+                playBtn.classList.add('border-neon');
+                visualizer.style.opacity = '1';
+                playIcon.style.opacity = '0.2'; // Dim icon so bars are visible
+            }
+        });
+
+        // 3. Logika Mobile Menu Burger
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const burgerIcon = document.getElementById('burgerIcon');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        let isMobileMenuOpen = false;
+
+        function toggleMobileMenu() {
+            isMobileMenuOpen = !isMobileMenuOpen;
+            if (isMobileMenuOpen) {
+                // Tampilkan Menu
+                mobileMenu.classList.remove('-translate-y-full', 'opacity-0');
+                mobileMenu.classList.add('translate-y-0', 'opacity-100');
+                burgerIcon.classList.replace('ph-list', 'ph-x'); // Ubah ikon burger jadi 'X'
+                mobileMenuBtn.classList.add('text-neon');
+            } else {
+                // Sembunyikan Menu
+                mobileMenu.classList.remove('translate-y-0', 'opacity-100');
+                mobileMenu.classList.add('-translate-y-full', 'opacity-0');
+                burgerIcon.classList.replace('ph-x', 'ph-list'); // Kembalikan ikon burger
+                mobileMenuBtn.classList.remove('text-neon');
+            }
+        }
+
+        // Buka/tutup menu saat tombol burger diklik
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Tutup menu otomatis saat salah satu link diklik
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (isMobileMenuOpen) toggleMobileMenu();
+            });
+        });
+
+        // 4. Logika Welcome Popup & Auto-Play Music
+        const welcomePopup = document.getElementById('welcomePopup');
+        const popupCard = document.getElementById('popupCard');
+        const startBtn = document.getElementById('startBtn');
+
+        // Animasi masuk popup setelah web dimuat
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                popupCard.classList.remove('scale-95', 'opacity-0');
+                popupCard.classList.add('scale-100', 'opacity-100');
+            }, 300); // Jeda sedikit agar transisi terlihat mulus
+        });
+
+        startBtn.addEventListener('click', () => {
+            // 1. Animasi sembunyikan popup
+            welcomePopup.style.opacity = '0';
+            popupCard.style.transform = 'scale(1.05)'; // Sedikit membesar sebelum hilang
+            
+            setTimeout(() => {
+                welcomePopup.style.display = 'none';
+            }, 500); // Sesuai dengan durasi transisi CSS
+
+            // 2. Mainkan musik otomatis (Aman karena user sudah melakukan interaksi klik)
+            if (!isPlaying) {
+                // Kita "menekan" tombol play secara terprogram agar semua logika 
+                // visualizer, ikon, dan status musik berjalan seperti biasa.
+                playBtn.click(); 
+            }
+        });
+
+        // 5. Logika Image Lightbox (Pop-up Gambar)
+        const lightbox = document.getElementById('imageLightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const closeLightbox = document.getElementById('closeLightbox');
+        const allImages = document.querySelectorAll('.img-zoomable');
+
+        // Tambahkan efek klik pada setiap gambar portofolio
+        allImages.forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src; // Ambil URL gambar yang diklik
+                lightbox.classList.remove('opacity-0', 'pointer-events-none');
+                
+                // Sedikit delay untuk efek membesar (zoom-in)
+                setTimeout(() => {
+                    lightboxImg.classList.remove('scale-95');
+                    lightboxImg.classList.add('scale-100');
+                    lightboxImg.classList.add('border-neon'); // Aktifkan border neon
+                }, 50);
+            });
+        });
+
+        // Fungsi untuk menutup Pop-up Gambar
+        function closeLightboxFunc() {
+            lightbox.classList.add('opacity-0', 'pointer-events-none');
+            lightboxImg.classList.remove('scale-100', 'border-neon');
+            lightboxImg.classList.add('scale-95');
+            
+            // Hapus gambar setelah layar kembali hitam agar tidak ada flicker
+            setTimeout(() => { lightboxImg.src = ''; }, 300);
+        }
+
+        closeLightbox.addEventListener('click', closeLightboxFunc);
+        
+        // Memungkinkan user menutup gambar hanya dengan mengklik area gelap di sekitarnya
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightboxFunc();
+            }
+        });
+
+    </script>
+</body>
+</html>
