@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -76,6 +77,271 @@
             position: relative;
             border-radius: 1rem;
             overflow: hidden;
+        }
+        
+        .img-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
+        .img-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%) contrast(1.1);
+            transition: filter 0.5s ease, transform 0.5s ease;
+        }
+
+        .img-frame:hover img {
+            filter: grayscale(0%) contrast(1.2);
+            transform: scale(1.05);
+        }
+
+        /* Cahaya Lembut di Belakang Teks (Beat Effect) */
+        .text-beat-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, hsla(var(--hue), 100%, 50%, calc(var(--neon-intensity) * 0.05)) 0%, transparent 60%);
+            z-index: -1;
+            transition: background 0.1s ease-out;
+            pointer-events: none;
+            filter: blur(40px);
+        }
+
+        /* Kursor Zoom untuk Gambar yang bisa di-klik */
+        .img-zoomable {
+            cursor: zoom-in;
+            transition: opacity 0.3s ease;
+        }
+        .img-zoomable:hover {
+            opacity: 0.8;
+        }
+
+        /* Custom Scrollbar untuk kotak komentar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--neon-color); }
+
+        /* Animasi Panah Melingkar (Custom SVG) */
+        @keyframes float-loop {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(15px) rotate(-5deg); }
+        }
+        .animate-float-loop {
+            animation: float-loop 3s ease-in-out infinite;
+        }
+
+        /* Efek Gradient Overlay untuk Video Intro */
+        .intro-overlay {
+            background: linear-gradient(to bottom, rgba(2,2,2,0.3) 0%, rgba(2,2,2,0.9) 100%);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-white selection:text-black font-semibold text-lg">
+
+    <!-- PRELOADER ANIMATION (2 DETIK) -->
+    <div id="preloader" class="fixed inset-0 z-[200] bg-[#020202] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative w-24 h-24 mb-6">
+            <!-- Lingkaran redup -->
+            <div class="absolute inset-0 border-4 border-gray-800 rounded-full"></div>
+            <!-- Lingkaran neon muter -->
+            <div class="absolute inset-0 border-4 border-transparent border-t-[var(--neon-color)] border-r-[var(--neon-color)] rounded-full animate-spin drop-shadow-[0_0_15px_var(--neon-color)]" style="animation-duration: 1s;"></div>
+            <!-- Ikon tengah -->
+            <div class="absolute inset-0 flex items-center justify-center">
+                <i class="ph ph-cpu text-3xl text-[var(--neon-color)] animate-pulse"></i>
+            </div>
+        </div>
+        <p class="font-tech text-[var(--neon-color)] tracking-[0.3em] text-sm font-bold animate-pulse drop-shadow-[0_0_10px_var(--neon-color)]">MENGINISIASI SISTEM...</p>
+    </div>
+
+    <!-- IMAGE LIGHTBOX POPUP -->
+    <div id="imageLightbox" class="fixed inset-0 z-[150] bg-[#020202]/95 backdrop-blur-md flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <button id="closeLightbox" class="absolute top-6 right-8 text-gray-400 hover:text-neon text-5xl transition-colors">&times;</button>
+        <img id="lightboxImg" src="" alt="Popup Image" class="max-w-[90vw] max-h-[85vh] object-contain rounded-xl border border-gray-700 shadow-[0_0_30px_var(--neon-color)] transform scale-95 transition-transform duration-300">
+    </div>
+
+    <!-- WELCOME POPUP / VIDEO INTRO -->
+    <div id="welcomePopup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-1000">
+        
+        <!-- Background Video Intro -->
+        <video id="introVideo" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0 opacity-50">
+            <source src="intro.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 intro-overlay z-0"></div> <!-- Gradient Overlay biar teks terbaca -->
+
+        <!-- Tombol Mute/Unmute Video -->
+        <button id="introSoundBtn" class="absolute top-6 right-6 z-20 w-12 h-12 flex items-center justify-center rounded-full glass-card border border-gray-700 text-white hover:text-[var(--neon-color)] transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+            <i class="ph ph-speaker-slash text-2xl"></i>
+        </button>
+
+        <!-- Kotak Konten Welcome -->
+        <div id="popupCard" class="glass-card p-8 md:p-12 rounded-3xl border-neon max-w-lg mx-4 text-center transform scale-95 opacity-0 transition-all duration-500 relative z-10 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+            <div class="relative inline-block mb-6">
+                <div class="absolute inset-0 bg-[var(--neon-color)] blur-xl opacity-30 rounded-full"></div>
+                <i class="ph ph-headphones text-6xl text-neon relative z-10"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-tech font-bold text-white mb-4">Selamat Datang di<br><span class="text-neon">Portofolio Sastro</span></h2>
+            <p class="text-gray-300 mb-8 leading-relaxed text-sm md:text-base font-medium">
+                Halo! Saya Moh Agus Sastro Negoro. Portofolio ini dirancang dengan pengalaman audio-visual yang reaktif. <br><br>
+                Pastikan <b>volume perangkat Anda menyala</b> untuk merasakan pengalaman maksimal!
+            </p>
+            <button id="startBtn" class="px-8 py-3 bg-[var(--neon-color)] text-black font-tech font-bold rounded-full hover:scale-105 transition-transform shadow-[0_0_20px_var(--neon-color)] text-lg w-full sm:w-auto">
+                LANJUT JELAJAHI
+            </button>
+        </div>
+    </div>
+
+    <!-- HEADER / NAVIGATION MENU -->
+    <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300">
+        <div class="glass-card border-b border-gray-800/50 bg-dark/80 backdrop-blur-md relative z-10">
+            <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+                <div class="font-tech font-bold text-xl text-white">SASTRO<span class="text-neon">.</span></div>
+                
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex gap-6 font-tech text-sm tracking-widest text-gray-400">
+                    <a href="#hero" class="hover:text-white hover:text-neon transition-all">HOME</a>
+                    <a href="#about" class="hover:text-white hover:text-neon transition-all">ABOUT</a>
+                    <a href="#education" class="hover:text-white hover:text-neon transition-all">EDUCATION</a>
+                    <a href="#roles" class="hover:text-white hover:text-neon transition-all">ROLES</a>
+                    <a href="#skills" class="hover:text-white hover:text-neon transition-all">SKILLS</a>
+                    <a href="#comments-section" class="hover:text-white hover:text-neon transition-all">KOMENTAR</a>
+                </nav>
+
+                <!-- Tombol Mobile Burger -->
+                <button id="mobileMenuBtn" class="md:hidden text-2xl text-gray-300 hover:text-white hover:text-neon transition-all focus:outline-none">
+                    <i id="burgerIcon" class="ph ph-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <nav id="mobileMenu" class="absolute top-16 left-0 w-full bg-dark/95 backdrop-blur-xl border-b border-gray-800/50 flex flex-col items-center py-8 gap-6 font-tech tracking-widest text-gray-400 transform -translate-y-full opacity-0 transition-all duration-300 -z-10 shadow-2xl">
+            <a href="#hero" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">HOME</a>
+            <a href="#about" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">ABOUT</a>
+            <a href="#education" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">EDUCATION</a>
+            <a href="#roles" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">ROLES</a>
+            <a href="#skills" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">SKILLS</a>
+            <a href="#comments-section" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">KOMENTAR</a>
+            
+            <!-- Tambahan Tombol Unduh CV di Burger Menu -->
+            <a href="https://drive.google.com/file/d/1jyqVYZxeB29S0tp411O9Qx6VQQX5dxLM/view?usp=sharing" target="_blank" class="mt-2 px-8 py-3 bg-transparent border-2 border-[var(--neon-color)] text-[var(--neon-color)] font-tech font-bold rounded-full hover:bg-[var(--neon-color)] hover:text-black transition-all text-lg flex items-center gap-2">
+                <i class="ph ph-download-simple"></i> UNDUH CV
+            </a>
+        </nav>
+    </header>
+
+    <!-- Latar Belakang Bar Beat (Equalizer Raksasa di Background) -->
+    <div id="bg-visualizer" class="fixed bottom-0 left-0 w-full h-[40vh] flex items-end justify-center gap-1 z-[0] opacity-40 pointer-events-none px-2 sm:px-6">
+        <!-- Bar dihasilkan lewat JS -->
+    </div>
+
+    <!-- Global Image Background -->
+    <div class="fixed inset-0 z-[-3] bg-[url('hero.png')] bg-cover bg-center bg-no-repeat opacity-[0.03] filter blur-[4px]"></div>
+    <!-- Background Grid & Gradient -->
+    <div class="fixed inset-0 z-[-2] bg-grid opacity-30"></div>
+    <div class="fixed top-0 left-0 w-full h-full z-[-4] bg-gradient-to-b from-[#020202] via-[#050505] to-[#020202]"></div>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-32 pb-32 relative z-10">
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="min-h-[80vh] flex flex-col items-center justify-center text-center relative py-20">
+            <div class="text-beat-bg"></div>
+            
+            <div class="inline-block mb-6 px-4 py-1.5 rounded-full border border-gray-800 bg-dark/50 text-sm font-tech text-gray-400 gs-reveal">
+                <span class="text-neon">●</span> SMKS PGRI 1 GIRI BANYUWANGI
+            </div>
+            
+            <h1 class="text-6xl md:text-8xl font-tech font-bold text-white tracking-tight mb-6 gs-reveal relative z-10 leading-none">
+                MOH AGUS <br/>
+                <span class="text-neon block mt-2">SASTRO NEGORO</span>
+            </h1>
+            
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10 gs-reveal relative z-10">
+                Arsitek Ekosistem Digital. Menggabungkan kode reaktif, seni visual, dan empati sosial untuk menciptakan sistem yang berdampak di lingkungan sekolah.
+            </p>
+
+            <div class="flex gap-4 gs-reveal relative z-10">
+                <a href="#masterpiece" class="px-8 py-3 bg-white text-black font-tech font-bold tracking-wider hover:bg-gray-200 transition-colors rounded-none">EXPLORE KARYA</a>
+                <a href="#about" class="px-8 py-3 border border-gray-700 text-white font-tech font-bold tracking-wider hover:border-white transition-colors rounded-none">TENTANG SAYA</a>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about" class="py-24 gs-reveal">
+            <div class="flex flex-col lg:flex-row gap-12 items-center relative">
+                <div class="w-full lg:w-1/3">
+                    <!-- FRAME FOTO: sastro -->
+                    <div class="img-frame aspect-[3/4] w-full max-w-sm mx-auto shadow-2xl relative z-10">
+                        <img src="sastro.jpg" alt="sastro.jpg" loading="lazy" class="img-zoomable">
+                    </div>
+                </div>
+                <div class="w-full lg:w-2/3 glass-card p-8 md:p-10 rounded-2xl border-neon relative">
+                    <div class="text-beat-bg" style="width: 150%; height: 150%;"></div>
+                    
+                    <h2 class="text-4xl font-tech font-bold text-white mb-6 flex items-center gap-3 relative z-10">
+                        <i class="ph ph-user-circle text-neon"></i> Integrasi Teknologi, Kreativitas, & Pengalaman
+                    </h2>
+                    <div class="space-y-4 text-gray-200 text-lg leading-relaxed relative z-10 font-medium">
+                        <p>
+                            Berasal dari Banyuwangi, perjalanan saya sebagai siswa TJKT di SMK PGRI 1 Giri bukan sekadar tentang mempelajari teknologi, tetapi tentang bagaimana teknologi dapat memberikan solusi nyata. Saat ini, saya memfokuskan energi saya pada eksplorasi Development dan AI Agent melalui ekosistem <span class="text-neon font-bold">e-Aspirasi Grisawangi</span>.
+                        </p>
+                        <p>
+                            Sisi logis saya sebagai pengembang selalu diseimbangkan oleh insting estetika saya sebagai <span class="text-neon font-semibold">Leader of Desain</span> Grisawangi. Saya memimpin arah visual sekolah untuk memastikan setiap karya grafis memiliki standar profesional.
+                        </p>
+                        <p>
+                            Lebih dari sekadar teknisi dan kreator, jiwa sosial saya tersalurkan penuh sebagai <span class="text-neon font-semibold">Partner BK</span>. Saya aktif mendampingi rekan sebaya hingga menjadi motor penggerak program-program besar seperti Jumat BK. Bagi saya, setiap baris kode, setiap piksel desain, dan setiap percakapan adalah bentuk dedikasi saya untuk almamater.
+                        </p>
+                    </div>
+
+                    <!-- Kolom Informasi Pribadi (Nama, Kelas, No Telp, Alamat) -->
+                    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 font-tech">
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-identification-card group-hover:text-neon transition-colors text-lg"></i> Nama Lengkap</p>
+                            <p class="text-white font-bold text-lg">Moh Agus Sastro Negoro</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-graduation-cap group-hover:text-neon transition-colors text-lg"></i> Kelas Saat Ini</p>
+                            <p class="text-[var(--neon-color)] font-bold text-lg">XI TJKT 2</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-phone group-hover:text-neon transition-colors text-lg"></i> Nomor Telepon</p>
+                            <p class="text-white font-bold text-lg">0838-6340-0384</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-map-pin group-hover:text-neon transition-colors text-lg"></i> Alamat</p>
+                            <p class="text-white font-bold text-sm md:text-base leading-tight">Jl. Yos Sudarso, Klatakan, Kalipuro, Banyuwangi</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- EDUCATION TIMELINE SECTION -->
+        <section id="education" class="py-24 relative">
+            <div class="text-beat-bg" style="width: 80%; top: 50%;"></div>
+            <h2 class="text-5xl font-tech font-bold text-center mb-16 text-white text-neon">Riwayat Pendidikan</h2>
+            
+            <div class="max-w-4xl mx-auto relative z-10 px-4">
+                <!-- Garis vertikal -->
+                <div class="absolute left-[30px] md:left-1/2 transform md:-translate-x-1/2 top-0 bottom-0 w-1 bg-gray-800 rounded-full"></div>
+                
+                <div class="space-y-12">
+                    <!-- SMK -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between w-full">
+                        <div class="md:w-5/12 w-full pl-16 md:pl-0 order-2 md:order-1 text-left md:text-right">
+                            <div class="glass-card p-6 rounded-2xl border-neon relative hover:scale-105 transition-transform">
+                                <h4 class="text-2xl font-tech font-bold text-white">SMK PGRI 1 Giri Banyuwangi</h4>
+                                <p class="text-neon font-bold text-sm            overflow: hidden;
         }
         
         .img-frame::after {
