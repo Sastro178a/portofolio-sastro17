@@ -137,6 +137,11 @@
         .animate-float-loop {
             animation: float-loop 3s ease-in-out infinite;
         }
+
+        /* Efek Gradient Overlay untuk Video Intro */
+        .intro-overlay {
+            background: linear-gradient(to bottom, rgba(2,2,2,0.3) 0%, rgba(2,2,2,0.9) 100%);
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-white selection:text-black font-semibold text-lg">
@@ -147,9 +152,22 @@
         <img id="lightboxImg" src="" alt="Popup Image" class="max-w-[90vw] max-h-[85vh] object-contain rounded-xl border border-gray-700 shadow-[0_0_30px_var(--neon-color)] transform scale-95 transition-transform duration-300">
     </div>
 
-    <!-- WELCOME POPUP -->
-    <div id="welcomePopup" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#020202]/90 backdrop-blur-xl transition-opacity duration-500">
-        <div id="popupCard" class="glass-card p-8 md:p-12 rounded-3xl border-neon max-w-lg mx-4 text-center transform scale-95 opacity-0 transition-all duration-500">
+    <!-- WELCOME POPUP / VIDEO INTRO -->
+    <div id="welcomePopup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-1000">
+        
+        <!-- Background Video Intro -->
+        <video id="introVideo" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0 opacity-50">
+            <source src="intro.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 intro-overlay z-0"></div> <!-- Gradient Overlay biar teks terbaca -->
+
+        <!-- Tombol Mute/Unmute Video -->
+        <button id="introSoundBtn" class="absolute top-6 right-6 z-20 w-12 h-12 flex items-center justify-center rounded-full glass-card border border-gray-700 text-white hover:text-[var(--neon-color)] transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+            <i class="ph ph-speaker-slash text-2xl"></i>
+        </button>
+
+        <!-- Kotak Konten Welcome -->
+        <div id="popupCard" class="glass-card p-8 md:p-12 rounded-3xl border-neon max-w-lg mx-4 text-center transform scale-95 opacity-0 transition-all duration-500 relative z-10 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
             <div class="relative inline-block mb-6">
                 <div class="absolute inset-0 bg-[var(--neon-color)] blur-xl opacity-30 rounded-full"></div>
                 <i class="ph ph-headphones text-6xl text-neon relative z-10"></i>
@@ -196,6 +214,11 @@
             <a href="#roles" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">ROLES</a>
             <a href="#skills" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">SKILLS</a>
             <a href="#comments-section" class="mobile-link hover:text-white hover:text-neon transition-all text-lg">KOMENTAR</a>
+            
+            <!-- Tambahan Tombol Unduh CV di Burger Menu -->
+            <a href="https://drive.google.com/file/d/1jyqVYZxeB29S0tp411O9Qx6VQQX5dxLM/view?usp=sharing" target="_blank" class="mt-2 px-8 py-3 bg-transparent border-2 border-[var(--neon-color)] text-[var(--neon-color)] font-tech font-bold rounded-full hover:bg-[var(--neon-color)] hover:text-black transition-all text-lg flex items-center gap-2">
+                <i class="ph ph-download-simple"></i> UNDUH CV
+            </a>
         </nav>
     </header>
 
@@ -230,7 +253,7 @@
                 Arsitek Ekosistem Digital. Menggabungkan kode reaktif, seni visual, dan empati sosial untuk menciptakan sistem yang berdampak di lingkungan sekolah.
             </p>
 
-            <div class="flex gap-4 gs-reveal relative z-10">
+            <div class="flex flex-wrap justify-center gap-4 gs-reveal relative z-10">
                 <a href="#masterpiece" class="px-8 py-3 bg-white text-black font-tech font-bold tracking-wider hover:bg-gray-200 transition-colors rounded-none">EXPLORE KARYA</a>
                 <a href="#about" class="px-8 py-3 border border-gray-700 text-white font-tech font-bold tracking-wider hover:border-white transition-colors rounded-none">TENTANG SAYA</a>
             </div>
@@ -249,7 +272,7 @@
                     <div class="text-beat-bg" style="width: 150%; height: 150%;"></div>
                     
                     <h2 class="text-4xl font-tech font-bold text-white mb-6 flex items-center gap-3 relative z-10">
-                        <i class="ph ph-user-circle text-neon"></i> Integrasi Teknologi, Kreativitas, & pembelajar
+                        <i class="ph ph-user-circle text-neon"></i> Integrasi Teknologi, Kreativitas, & Pengalaman
                     </h2>
                     <div class="space-y-4 text-gray-200 text-lg leading-relaxed relative z-10 font-medium">
                         <p>
@@ -262,6 +285,27 @@
                             Lebih dari sekadar teknisi dan kreator, jiwa sosial saya tersalurkan penuh sebagai <span class="text-neon font-semibold">Partner BK</span>. Saya aktif mendampingi rekan sebaya hingga menjadi motor penggerak program-program besar seperti Jumat BK. Bagi saya, setiap baris kode, setiap piksel desain, dan setiap percakapan adalah bentuk dedikasi saya untuk almamater.
                         </p>
                     </div>
+
+                    <!-- Kolom Informasi Pribadi (Nama, Kelas, No Telp, Alamat) -->
+                    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 font-tech">
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-identification-card group-hover:text-neon transition-colors text-lg"></i> Nama Lengkap</p>
+                            <p class="text-white font-bold text-lg">Moh Agus Sastro Negoro</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-graduation-cap group-hover:text-neon transition-colors text-lg"></i> Kelas Saat Ini</p>
+                            <p class="text-[var(--neon-color)] font-bold text-lg">XI TJKT 2</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-phone group-hover:text-neon transition-colors text-lg"></i> Nomor Telepon</p>
+                            <p class="text-white font-bold text-lg">0838-6340-0384</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-neon transition-colors group">
+                            <p class="text-gray-500 text-sm mb-1 flex items-center gap-2"><i class="ph ph-map-pin group-hover:text-neon transition-colors text-lg"></i> Alamat</p>
+                            <p class="text-white font-bold text-sm md:text-base leading-tight">Jl. Yos Sudarso, Klatakan, Kalipuro, Banyuwangi</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -328,7 +372,7 @@
                     <p class="text-gray-400 mb-6">Membangun ekosistem informasi sekolah, mencakup pendataan siswa, aspirasi cerdas, dan interaksi interaktif.</p>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="img-frame aspect-video"><img src="indexeasispirasi.jpeg" alt="indexeasispirasi.jpeg" class="img-zoomable"></div>
-                        <div class="img-frame aspect-video"><img src="adminesapirasigmail.jpg" alt="adminesapirasigmail.jpg" class="img-zoomable"></div>
+                        <div class="img-frame aspect-video"><img src="adminesapirasigmail.jpeg" alt="adminesapirasigmail.jpeg" class="img-zoomable"></div>
                     </div>
                 </div>
 
@@ -348,7 +392,7 @@
                 <div class="glass-card p-8 rounded-2xl border-t border-gray-700 hover:border-neon transition duration-300 gs-item">
                     <i class="ph ph-users-three text-5xl text-neon mb-4 block"></i>
                     <h3 class="text-2xl font-tech font-bold text-white mb-3">Partner BK</h3>
-                    <p class="text-gray-400 mb-6">Menjadi jembatan empati, membantu pembelajaran di kelas, dan motor penggerak program Jumat BK.</p>
+                    <p class="text-gray-400 mb-6">Menjadi jembatan empati, membantu pengalaman di kelas, dan motor penggerak program Jumat BK.</p>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="img-frame aspect-video"><img src="jumatbk.jpeg" alt="jumatbk.jpeg" class="img-zoomable"></div>
                         <div class="img-frame aspect-video"><img src="sertifikatbk.jpg" alt="sertifikatbk.jpg" class="img-zoomable"></div>
@@ -361,7 +405,7 @@
                     <h3 class="text-2xl font-tech font-bold text-white mb-3">Dokumentator OSIS</h3>
                     <p class="text-gray-400 mb-6">Merangkai setiap kejadian penting sekolah menjadi cerita sinematik melalui lensa kamera.</p>
                     <div class="grid grid-cols-3 gap-3">
-                        <div class="img-frame aspect-square"><img src="dokumerntasiharkartini.jpeg" alt="dokumerntasiharkartini.jpeg" class="img-zoomable"></div>
+                        <div class="img-frame aspect-square"><img src="dokumerntasiharkartini.jpg" alt="dokumerntasiharkartini.jpg" class="img-zoomable"></div>
                         <div class="img-frame aspect-[3/4]"><img src="dokumsosialisasi.jpeg" alt="dokumsosialisasi.jpeg" class="img-zoomable"></div>
                         <div class="img-frame aspect-square"><img src="pegangkamera.png" alt="pegangkamera.png" class="img-zoomable"></div>
                     </div>
@@ -505,7 +549,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <!-- Form Tambah Komentar -->
                     <div class="md:col-span-1 glass-card p-6 rounded-2xl border-t border-gray-700 h-fit relative">
-                        <h3 class="text-xl font-tech text-white mb-4">Tinggalkan Komentar</h3>
+                        <h3 class="text-xl font-tech text-white mb-4">Tinggalkan Pesan</h3>
                         
                         <!-- Peringatan Error Tersembunyi -->
                         <div id="commentErrorMsg" class="hidden mb-4 p-3 bg-red-900/50 border border-red-500 rounded-lg text-red-200 text-xs font-tech"></div>
@@ -528,7 +572,7 @@
                             <textarea id="senderMessage" placeholder="Tulis komentar atau kesanmu..." required rows="4" class="w-full bg-[#050505] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--neon-color)] transition-colors font-tech text-sm resize-none"></textarea>
                             
                             <button type="submit" id="submitBtn" class="w-full py-3 bg-[var(--neon-color)] text-black font-tech font-bold rounded-xl hover:scale-105 transition-transform shadow-[0_0_15px_var(--neon-color)] text-sm flex items-center justify-center gap-2">
-                                <i class="ph ph-paper-plane-right"></i> KIRIM KOMENTAR
+                                <i class="ph ph-paper-plane-right"></i> KIRIM PESAN
                             </button>
                         </form>
                     </div>
@@ -536,7 +580,7 @@
                     <!-- Daftar Komentar (Realtime) -->
                     <div class="md:col-span-2 glass-card p-6 rounded-2xl border-t border-gray-700 max-h-[500px] overflow-y-auto custom-scrollbar">
                         <h3 class="text-xl font-tech text-white mb-4 flex justify-between items-center">
-                            <span>Komentar Masuk</span>
+                            <span>Pesan Masuk</span>
                             <span class="text-xs text-neon bg-gray-900 px-3 py-1 rounded-full animate-pulse border border-[var(--neon-color)]">Live</span>
                         </h3>
                         <div id="commentsList" class="flex flex-col gap-4">
@@ -554,7 +598,6 @@
                     </p>
                     
                     <!-- Vektor Gambar Panah Muter-Muter (SVG) -->
-                    <!-- Margin kiri negatif (-ml-8 / -ml-20) menarik panah condong ke kiri menunjuk gelembung -->
                     <div class="w-full flex justify-start -ml-8 md:-ml-16 lg:-ml-20 mt-4 pointer-events-none">
                         <svg viewBox="0 0 200 200" class="w-40 md:w-56 lg:w-64 h-auto text-[var(--neon-color)] animate-float-loop drop-shadow-[0_0_15px_var(--neon-color)]" style="color: var(--neon-color);">
                             <!-- Jalur tali panah yang muter-muter (loop-de-loop) -->
@@ -570,20 +613,28 @@
 
     </main>
 
+    <!-- FOOTER (Dengan Tambahan Tombol Unduh CV di Bagian Paling Bawah) -->
     <!-- FOOTER -->
     <footer class="border-t border-gray-800 bg-dark relative z-10 gs-reveal">
         <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="text-center md:text-left flex flex-col gap-2">
                 <h3 class="text-3xl font-tech font-bold text-white mb-1">Moh Agus <span class="text-neon">Sastro Negoro</span></h3>
-                <p class="text-gray-400 italic">"Terus Belajar, Terus Membangun, Terus Mengabadi."</p>
+                <p class="text-gray-400 italic">"Terus Belajar, Terus Membangun, Terus Memperkaya Pengalaman."</p>
                 <div class="flex items-center justify-center md:justify-start gap-2 text-gray-500 mt-2 text-sm font-tech">
                     <i class="ph ph-map-pin text-neon"></i>
                     <p>Jl. Yos Sudarso, Klatakan, Kalipuro, Banyuwangi, Indonesia</p>
                 </div>
             </div>
-            <div class="text-center md:text-right">
-                <p class="text-sm text-gray-500">Crafted with Precision by Sastro Negoro</p>
-                <p class="text-sm text-neon font-tech mt-1">SMK PGRI 1 Giri (Grisawangi)</p>
+            <div class="text-center md:text-right flex flex-col items-center md:items-end gap-4">
+                <!-- Tambahan Tombol Unduh CV di Footer -->
+                <a href="https://drive.google.com/file/d/1jyqVYZxeB29S0tp411O9Qx6VQQX5dxLM/view?usp=sharing" target="_blank" class="px-6 py-2 border border-[var(--neon-color)] text-[var(--neon-color)] font-tech font-bold rounded-full hover:bg-[var(--neon-color)] hover:text-black transition-all flex items-center gap-2 shadow-[0_0_10px_var(--neon-color)]">
+                    <i class="ph ph-download-simple text-xl"></i> UNDUH CV SEKARANG
+                </a>
+                
+                <div>
+                    <p class="text-sm text-gray-500">Crafted with Precision by Sastro Negoro</p>
+                    <p class="text-sm text-neon font-tech mt-1">SMK PGRI 1 Giri (Grisawangi)</p>
+                </div>
             </div>
         </div>
     </footer>
@@ -715,10 +766,13 @@
             }
         });
 
-        // 3. Welcome Popup Logic
+        // 3. Welcome Popup & Intro Video Logic
         const welcomePopup = document.getElementById('welcomePopup');
         const popupCard = document.getElementById('popupCard');
         const startBtn = document.getElementById('startBtn');
+        const introVideo = document.getElementById('introVideo');
+        const introSoundBtn = document.getElementById('introSoundBtn');
+        const soundIcon = introSoundBtn.querySelector('i');
 
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -727,12 +781,31 @@
             }, 300);
         });
 
+        // Logic Mute/Unmute Video Intro
+        introSoundBtn.addEventListener('click', () => {
+            if (introVideo.muted) {
+                introVideo.muted = false;
+                soundIcon.classList.replace('ph-speaker-slash', 'ph-speaker-high');
+                introSoundBtn.classList.add('text-[var(--neon-color)]', 'border-[var(--neon-color)]');
+                introSoundBtn.classList.remove('text-white', 'border-gray-700');
+            } else {
+                introVideo.muted = true;
+                soundIcon.classList.replace('ph-speaker-high', 'ph-speaker-slash');
+                introSoundBtn.classList.remove('text-[var(--neon-color)]', 'border-[var(--neon-color)]');
+                introSoundBtn.classList.add('text-white', 'border-gray-700');
+            }
+        });
+
         startBtn.addEventListener('click', () => {
+            // Mute kembali & pause video saat klik Lanjut
+            introVideo.muted = true;
+            setTimeout(() => { introVideo.pause(); }, 1000);
+
             welcomePopup.style.opacity = '0';
             popupCard.style.transform = 'scale(1.05)'; 
-            setTimeout(() => { welcomePopup.style.display = 'none'; }, 500);
+            setTimeout(() => { welcomePopup.style.display = 'none'; }, 1000);
 
-            if (!isPlaying) { playBtn.click(); }
+            if (!isPlaying) { playBtn.click(); } // Auto play music
         });
 
         // 4. Mobile Menu Burger
@@ -838,7 +911,7 @@
                 commentsList.innerHTML = ''; 
                 
                 if (snapshot.empty) {
-                    commentsList.innerHTML = '<p class="text-gray-500 text-sm font-tech text-center py-10">Belum ada Komentar. Jadilah yang pertama!</p>';
+                    commentsList.innerHTML = '<p class="text-gray-500 text-sm font-tech text-center py-10">Belum ada pesan. Jadilah yang pertama!</p>';
                     return;
                 }
 
